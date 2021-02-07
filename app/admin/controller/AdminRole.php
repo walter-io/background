@@ -14,7 +14,6 @@ class AdminRole extends BaseController
 {
     /**
      * 表头
-     * @var \string[][]
      */
     private $tableTitle = [
         ['field' => 'id', 'title' => 'ID'],
@@ -37,9 +36,6 @@ class AdminRole extends BaseController
 
     /**
      * 列表
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
      */
     public function getLists()
     {

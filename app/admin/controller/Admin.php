@@ -12,10 +12,14 @@ use think\facade\View;
  */
 class Admin extends BaseController
 {
+    /**
+     * 密码的盐
+     * @var string
+     */
     public $salt = 'my_background'; // 盐 请自行配置
 
     /**
-     *
+     * 表头
      */
     private $tableTitle = [
         ['field' => 'id', 'title' => 'ID'],
@@ -38,12 +42,21 @@ class Admin extends BaseController
         ]);
     }
 
+    /**
+     * 获取列表
+     */
     public function getLists()
     {
-
         $limit = request()->post('limit');
-        $result = Db::connect()->name('admin')->paginate($limit)->toArray();
-        $this->success('', '', $result);
+        $arrData = Db::connect()
+            ->name('admin')
+            ->alias('A')
+            ->field('A.id, A.name, A.real_name, A.phone, A.create_dt, ROLE.name role_name')
+            ->leftJoin('admin_role ROLE', 'A.role_id = ROLE.id')
+            ->paginate($limit)
+            ->toArray();
+
+        $this->success('', '', $arrData);
     }
 
     /**
