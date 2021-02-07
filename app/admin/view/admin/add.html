@@ -1,0 +1,115 @@
+{extend name="public/main" /}
+
+{block name="body"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>登录名称
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    3到30个字符
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>角色</label>
+                <div class="layui-input-block">
+                    {foreach $arrRole as $k=>$v }
+                    <input type="radio" name="role_id" lay-skin="primary" title="{$v.name}" value="{$v.id}">
+                    {/foreach}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>真实姓名
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" name="real_name" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    1到30个字符
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>手机号码
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="phone" name="phone" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>密码
+                </label>
+                <div class="layui-input-inline">
+                    <input type="password" name="password" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    6到50个字符
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>确认密码
+                </label>
+                <div class="layui-input-inline">
+                    <input type="password" name="re_password" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <button class="layui-btn" lay-filter="add" lay-submit="">
+                    添加
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'layer'],
+        function () {
+            $ = layui.jquery;
+            var form = layui.form,
+                layer = layui.layer;
+
+            //监听提交
+            form.on('submit(add)', function (data) {
+                    $.ajax({
+                        type: "post",
+                        url: "{:url('/admin/admin/add')}",
+                        data: data.field,
+                        dataType: "json",
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function (res) {
+                            if (res.code == 0) {
+                                layer.msg(res.msg, {
+                                    icon: 2,
+                                    time: 2000//2秒关闭（如果不配置，默认是3秒）
+                                });
+                                return false;
+                            }
+                            layer.msg(res.msg, {
+                                icon: 1,
+                                time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                            }, function () {
+                                //关闭当前frame
+                                xadmin.close();
+                                // 可以对父窗口进行刷新
+                                xadmin.father_reload();
+                            });
+                        }
+                    });
+                    return false;
+                });
+        });
+</script>
+{/block}
+</body>

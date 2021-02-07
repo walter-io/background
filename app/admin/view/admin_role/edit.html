@@ -1,0 +1,73 @@
+{extend name="public/main" /}
+
+{block name="body"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <form class="layui-form" action="{:url('/admin/AdminRole/edit')}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>角色名称
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" autocomplete="off" class="layui-input" placeholder="1到20个字符" value="{$data.name}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>描述
+                </label>
+                <div class="layui-input-block">
+                    <textarea placeholder="输入内容只能1到150个字符" name="description" class="layui-textarea">{$data.description}</textarea>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <input type="hidden" name="id" value="{$data.id}">
+                <label class="layui-form-label"></label>
+                <button class="layui-btn" lay-filter="edit" lay-submit="">
+                    修改
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'layer'],
+        function () {
+            $ = layui.jquery;
+            var form = layui.form,
+                layer = layui.layer;
+
+            //监听提交
+            form.on('submit(edit)', function (data) {
+                $.ajax({
+                    type: "post",
+                    url: data.form.action,
+                    data: data.field,
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {
+                                icon: 2,
+                                time: 2000//2秒关闭（如果不配置，默认是3秒）
+                            });
+                            return;
+                        }
+                        layer.msg(res.msg, {
+                            icon: 1,
+                            time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            //关闭当前frame
+                            xadmin.close();
+                            // 可以对父窗口进行刷新
+                            xadmin.father_reload();
+                        });
+                    }
+                });
+                return false;
+            });
+        });
+</script>
+{/block}
+</body>

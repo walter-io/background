@@ -1,0 +1,21 @@
+{extend name='public/main'}
+
+{block name='body'}
+
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <blockquote class="layui-elem-quote">欢迎管理员：
+                        <span class="x-red"></span>！当前时间:{:date('Y-m-d H:i:s',time())}
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+{/block}

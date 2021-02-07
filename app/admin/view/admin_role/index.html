@@ -1,0 +1,96 @@
+{extend name='public/main'}
+
+{block name='body'}
+
+<body>
+<div class="x-nav">
+          <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">演示</a>
+            <a><cite>导航元素</cite></a>
+          </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <button class="layui-btn" onclick="xadmin.open('添加','{:url(\'/admin/AdminRole/add\')}',600,500)"><i class="layui-icon"></i>添加</button>
+                </div>
+                <div class="layui-card-body">
+                    <table id="common-data" player-field="player" lay-filter="tool"></table>
+                    <script type="text/html" id="toolbar">
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    layui.use(['laydate', 'form', 'layer', 'table'], function () {
+        var layer   = layui.layer
+        var table   = layui.table
+
+        // 列表渲染
+        table_render(layer, table, {}, eval({$tableTitle|raw}), "{:url('/admin/AdminRole/getLists')}")
+
+        table.on('tool(tool)', function(obj) {
+            switch (obj.event) {
+                case 'edit':
+                    layer.open({
+                        title: "查看记录",
+                        area: ['900px', '600px'],
+                        type: 2,
+                        fixed: false, //不固定
+                        maxmin: true,
+                        content: "{:url('admin/AdminRole/edit')}?id=" + obj.data.id
+                    })
+                    break;
+                case 'del':
+                    layer.confirm('确定删除?', function (index) {
+                        del(obj.data.id)
+                    })
+                    break;
+            }
+        })
+    });
+
+    /**
+     * 删除
+     * @param id
+     */
+    function del(id) {
+        //监听提交
+        $.ajax({
+            type: "post",
+            url: "{:url('/admin/AdminRole/del')}",
+            data: {'id': id},
+            dataType: "json",
+            success: function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {
+                        icon: 2,
+                        time: 2000//2秒关闭（如果不配置，默认是3秒）
+                    });
+                    return;
+                }
+                layer.msg(res.msg, {
+                    icon: 1,
+                    time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                }, function () {
+                    //关闭当前frame
+                    xadmin.close();
+                    // 可以对父窗口进行刷新
+                    xadmin.father_reload();
+                });
+            }
+        });
+    }
+</script>
+{/block}
