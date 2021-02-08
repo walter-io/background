@@ -1,0 +1,130 @@
+{extend name="public/main" /}
+
+{block name="title"}{$purviewTreeArr[$currentPurviewId]['purview_name']}{/block}
+{block name="css"}
+<link rel="stylesheet" href="/static/admin/lib/layui/css/eleTree.css" media="all">
+<link rel="stylesheet" href="/static/admin/lib/ztree/css/metroStyle/metroStyle.css" type="text/css">
+<style>
+    .ztree * {
+        font-size: 14px;
+    }
+</style>
+{/block}
+{block name="js"}
+<script type="text/javascript" src="/admin/lib/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="/admin/lib/ztree/js/jquery.ztree.excheck.js"></script>
+{/block}
+{block name="body"}
+<body>
+<div class="x-nav">
+          <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">演示</a>
+            <a><cite>导航元素</cite></a>
+          </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+    </a>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <button class="layui-btn" onclick="xadmin.open('添加管理权限','{:url('admin/Purview/add')}',800,600)">
+                        <i class="layui-icon"></i>添加
+                    </button>
+                </div>
+                <div class="layui-card-body ">
+                    <ul id="purviewTree" class="ztree"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var zTreeObj;
+    // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
+    var setting = {
+        view: {
+            showIcon: false,
+            addDiyDom: addDiyDom,
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+    };
+
+    var editPurviewFlag = "{$editPurviewFlag}";
+    var deletePurviewFlag = "{$deletePurviewFlag}";
+
+    var data = '{:json_encode($list)}'
+    data = eval('(' + data + ')');
+
+    $(document).ready(function () {
+        zTreeObj = $.fn.zTree.init($("#purviewTree"), setting, data);
+        zTreeObj.expandAll(true)
+    });
+
+    function addDiyDom(treeId, treeNode) {
+        var aObj = $("#" + treeNode.tId + "_a");
+        if (editPurviewFlag) {
+            var editStr = "<i purviewId='" + treeNode.id + "' id='diyBtn1_" + treeNode.id + "' style='margin-left:15px;' class=\"layui-icon my-edit\">&#xe642;</i>";
+            aObj.append(editStr);
+            var btn1 = $("#diyBtn1_" + treeNode.id);
+            if (btn1) btn1.bind("click", edit);
+        }
+
+        if (deletePurviewFlag) {
+            var deleteStr = "<i purviewId='" + treeNode.id + "' id='diyBtn2_" + treeNode.id + "'  class=\"layui-icon\">&#xe640;</i>";
+            aObj.append(deleteStr);
+            var btn2 = $("#diyBtn2_" + treeNode.id);
+            if (btn2) btn2.bind("click", del);
+        }
+    };
+
+    function edit() {
+        var purviewId = $(this).attr('purviewId');
+        var url = "{:url('admin/adminManage.Purview/edit')}"
+        url = url.substring(0, url.length - 5);
+        xadmin.open('编辑', url + '/purviewId/' + purviewId)
+    }
+
+    function del() {
+        var obj = $(this)
+        layer.confirm('确认要删除吗？', function (index) {
+            var purviewId = $(obj).attr('purviewId');
+            var url = "{:url('admin/adminManage.Purview/delete')}";
+            url = url.substring(0, url.length - 5) + '/purviewId/' + purviewId;
+            var data = {};
+            data["purviewId"] = purviewId;
+            $.ajax({
+                type: "post",
+                url: url,
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify(data),
+                dataType: "json",
+                success: function (data) {
+                    if (data.code == 0) {
+                        layer.msg(data.msg, {
+                            icon: 2,
+                            time: 2000//2秒关闭（如果不配置，默认是3秒）
+                        });
+                        return;
+                    }
+                    layer.msg(data.msg, {
+                        icon: 1,
+                        time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                    }, function () {
+                        location.reload();
+                    });
+                }
+            });
+        })
+    }
+
+</script>
+{/block}
