@@ -10,7 +10,7 @@ use think\facade\View;
  * Class Admin
  * @package app\admin\controller
  */
-class AdminRole extends BaseController
+class Role extends BaseController
 {
     /**
      * 表头

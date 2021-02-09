@@ -18,7 +18,7 @@
         <div class="layui-col-md12">
             <div class="layui-card">
                 <div class="layui-card-header">
-                    <button class="layui-btn" onclick="xadmin.open('添加','{:url(\'/admin/AdminRole/add\')}',600,500)"><i class="layui-icon"></i>添加</button>
+                    <button class="layui-btn" onclick="xadmin.open('添加','{:url(\'/admin/Role/add\')}',600,500)"><i class="layui-icon"></i>添加</button>
                 </div>
                 <div class="layui-card-body">
                     <table id="common-data" player-field="player" lay-filter="tool"></table>
@@ -39,7 +39,7 @@
         var table   = layui.table
 
         // 列表渲染
-        table_render(layer, table, {}, eval({$tableTitle|raw}), "{:url('/admin/AdminRole/getLists')}")
+        table_render(layer, table, {}, eval({$tableTitle|raw}), "{:url('/admin/Role/getLists')}")
 
         table.on('tool(tool)', function(obj) {
             switch (obj.event) {
@@ -50,7 +50,7 @@
                         type: 2,
                         fixed: false, //不固定
                         maxmin: true,
-                        content: "{:url('admin/AdminRole/edit')}?id=" + obj.data.id
+                        content: "{:url('admin/Role/edit')}?id=" + obj.data.id
                     })
                     break;
                 case 'del':
@@ -70,7 +70,7 @@
         //监听提交
         $.ajax({
             type: "post",
-            url: "{:url('/admin/AdminRole/del')}",
+            url: "{:url('/admin/Role/del')}",
             data: {'id': id},
             dataType: "json",
             success: function (res) {

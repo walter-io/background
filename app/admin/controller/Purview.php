@@ -13,7 +13,7 @@ use think\facade\View;
 class Purview extends BaseController
 {
     /**
-     * 管理员
+     * 权限
      * @return string
      */
     public function index()
@@ -25,15 +25,9 @@ class Purview extends BaseController
             ->select()
             ->toArray();
 
-        // TODO HERE
-//        $data = purview_tree($arrData);
-
-        $editPurviewFlag = true;
-        $deletePurviewFlag = true;
+        $data = purview_tree_sec($arrData, [], 0);
         return View::fetch('', [
-            'list' => [],
-            'editPurviewFlag' => $editPurviewFlag,
-            'deletePurviewFlag' => $deletePurviewFlag,
+            'list' => json_encode($data),
         ]);
     }
 
@@ -60,8 +54,15 @@ class Purview extends BaseController
             }
         }
 
+        $arrData = Db::connect()
+            ->name('purview')
+            ->field('id, name, parent_id, controller, action')
+            ->order('sort', 'asc')
+            ->select()
+            ->toArray();
+        $arrData = purview_tree($arrData);
         return View::fetch('', [
-            'arrData' => []
+            'arrData' => $arrData
         ]);
     }
 

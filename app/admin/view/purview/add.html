@@ -14,10 +14,7 @@
                     <select name="parent_id" lay-search>
                         <option value="0">顶级菜单</option>
                         {foreach $arrData as $key=>$vo }
-                        <option value="{$vo['id']}">
-                            {:str_repeat('&nbsp;&nbsp;', $vo['level']-1)}
-                            {:str_repeat('-', $vo['level']-1)}{$vo['name']}
-                        </option>
+                        <option value="{$vo['id']}">{:str_repeat('&nbsp;&nbsp;', $vo['level']-1)} {:str_repeat('-', $vo['level']-1)}{$vo['name']}</option>
                         {/foreach}
                     </select>
                 </div>
