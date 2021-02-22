@@ -14,6 +14,7 @@ function purview_tree($arr, $pid = 0, $level = 1, $idName = 'id', $pidName = 'pa
     }
     return $tree;
 }
+
 // 递归树
 function purview_tree_sec($originArr, $resultArr, $pid = 0)
 {
