@@ -26,3 +26,18 @@ function purview_tree_sec($originArr, $resultArr, $pid = 0)
     }
     return $resultArr;
 }
+
+// 递归树
+function purview_tree_third($data, $level = 0)
+{
+    $str = '';
+    if (empty($data)) {
+        return $str;
+    }
+    $space = str_repeat('&nbsp;', $level * 3);
+    foreach ($data as $k => $v) {
+        $str .= "<p>{$space}{$v['name']}</p>";
+        $str.= purview_tree_third($v['children'] ?? [], $level++);
+    }
+    return $str;
+}

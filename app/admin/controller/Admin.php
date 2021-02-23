@@ -52,7 +52,7 @@ class Admin extends BaseController
             ->name('admin')
             ->alias('A')
             ->field('A.id, A.name, A.real_name, A.phone, A.create_dt, ROLE.name role_name')
-            ->leftJoin('admin_role ROLE', 'A.role_id = ROLE.id')
+            ->leftJoin('role ROLE', 'A.role_id = ROLE.id')
             ->paginate($limit)
             ->toArray();
 
@@ -88,7 +88,7 @@ class Admin extends BaseController
         }
 
         // 角色列表
-        $arrRole = Db::connect()->name('admin_role')->field('id, name')->select()->toArray();
+        $arrRole = Db::connect()->name('role')->field('id, name')->select()->toArray();
         return View::fetch('', [
             'arrRole' => $arrRole
         ]);
@@ -129,7 +129,7 @@ class Admin extends BaseController
 
         // 角色列表
         $data    = Db::connect()->name('admin')->where(['id' => $id])->findOrEmpty();
-        $arrRole = Db::connect()->name('admin_role')->field('id, name')->selectOrFail()->toArray();
+        $arrRole = Db::connect()->name('role')->field('id, name')->selectOrFail()->toArray();
         return View::fetch('', [
             'arrRole' => $arrRole,
             'data'    => $data

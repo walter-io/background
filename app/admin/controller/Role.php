@@ -40,7 +40,7 @@ class Role extends BaseController
     public function getLists()
     {
         $limit = request()->post('limit');
-        $result = Db::connect()->name('admin_role')->paginate($limit)->toArray();
+        $result = Db::connect()->name('role')->paginate($limit)->toArray();
         $this->success('', '', $result);
     }
 
@@ -57,7 +57,7 @@ class Role extends BaseController
                 'create_dt'   => date('Y-m-d H:i:s'),
                 'update_dt'   => date('Y-m-d H:i:s'),
             ];
-            $result = Db::connect()->name('admin_role')->insert($data);
+            $result = Db::connect()->name('role')->insert($data);
             if ($result) {
                 $this->success('添加成功');
             } else {
@@ -84,14 +84,14 @@ class Role extends BaseController
                 'create_dt'   => date('Y-m-d H:i:s'),
                 'update_dt'   => date('Y-m-d H:i:s'),
             ];
-            $result = Db::connect()->name('admin_role')->where(['id' => $id])->update($data);
+            $result = Db::connect()->name('role')->where(['id' => $id])->update($data);
             if ($result) {
                 $this->success('更新成功');
             } else {
                 $this->error('更新失败');
             }
         }
-        $data = Db::connect()->name('admin_role')->where(['id' => $id])->findOrEmpty();
+        $data = Db::connect()->name('role')->where(['id' => $id])->findOrEmpty();
         return View::fetch('', ['data' => $data]);
     }
 
@@ -104,7 +104,7 @@ class Role extends BaseController
         if (empty($id)) {
             $this->error('缺少参数');
         }
-        Db::connect()->name('admin_role')->where(['id' => $id])->delete();
+        Db::connect()->name('role')->where(['id' => $id])->delete();
         $this->success('删除成功');
     }
 }

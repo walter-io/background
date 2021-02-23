@@ -27,7 +27,7 @@ class Purview extends BaseController
 
         $data = purview_tree_sec($arrData, [], 0);
         return View::fetch('', [
-            'list' => json_encode($data),
+            'list' => $data,
         ]);
     }
 
@@ -83,14 +83,14 @@ class Purview extends BaseController
                 'create_dt'   => date('Y-m-d H:i:s'),
                 'update_dt'   => date('Y-m-d H:i:s'),
             ];
-            $result = Db::connect()->name('admin_role')->where(['id' => $id])->update($data);
+            $result = Db::connect()->name('role')->where(['id' => $id])->update($data);
             if ($result) {
                 $this->success('更新成功');
             } else {
                 $this->error('更新失败');
             }
         }
-        $data = Db::connect()->name('admin_role')->where(['id' => $id])->findOrEmpty();
+        $data = Db::connect()->name('role')->where(['id' => $id])->findOrEmpty();
         return View::fetch('', ['data' => $data]);
     }
 
@@ -103,7 +103,7 @@ class Purview extends BaseController
         if (empty($id)) {
             $this->error('缺少参数');
         }
-        Db::connect()->name('admin_role')->where(['id' => $id])->delete();
+        Db::connect()->name('role')->where(['id' => $id])->delete();
         $this->success('删除成功');
     }
 }
