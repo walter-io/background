@@ -1,0 +1,130 @@
+{extend name="public/main" /}
+
+{block name="title"}{$purviewTreeArr[$currentPurviewId]['purview_name']}{/block}
+{block name="css"}
+<link rel="stylesheet" href="/static/admin/css/font.css">
+<link rel="stylesheet" href="/static/admin/lib/layui/css/eleTree.css" media="all">
+<link rel="stylesheet" href="/static/admin/lib/ztree/css/metroStyle/metroStyle.css" type="text/css">
+<style>
+    .ztree * {
+        font-size: 14px;
+    }
+</style>
+{/block}
+{block name="js"}
+<script src="/static/admin/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/static/admin/lib/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="/static/admin/lib/ztree/js/jquery.ztree.excheck.js"></script>
+{/block}
+{block name="body"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <ul id="purviewTree" class="ztree"></ul>
+                        </div>
+                        <div class="layui-form-item">
+                            <button class="layui-btn" lay-filter="assign" lay-submit="">
+                                分配管理权限
+                            </button>
+                        </div>
+                        <input type="hidden" name="id" value="{$id}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var zTreeObj;
+    var zTree = $.fn.zTree;
+    // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
+    var setting = {
+        view: {
+            showIcon: false
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        check: {
+            enable: true,
+            chkStyle: "checkbox",
+            chkboxType: {"Y": "ps", "N": "s"}
+        },
+    };
+
+    var data = '{:json_encode($list)}'
+    data = eval('(' + data + ')');
+
+    $(document).ready(function () {
+        zTreeObj = $.fn.zTree.init($("#purviewTree"), setting, data);
+        zTreeObj.expandAll(true)
+    });
+
+
+    layui.config({
+        base: "/admin/lib/layui/lay/mymodules/"
+    }).use(['jquery', 'form', 'layer'], function () {
+        $ = layui.jquery;
+        var form = layui.form,
+            layer = layui.layer;
+
+        //监听提交
+        form.on('submit(assign)',
+            function (data) {
+                url = data.form.action;
+                var treeObj = zTree.getZTreeObj("purviewTree");
+                var nodes = zTreeObj.transformToArray(treeObj.getNodes());
+
+                var purviewIds = [];
+                for (i = 0; i < nodes.length; i++) {
+                    if (nodes[i].checked) {
+                        purviewIds.push(nodes[i].id)
+                    }
+                }
+                $.ajax({
+                    type: "post",
+                    url: "{:url('admin/Role/editPurview')}",
+                    data: {
+                        ids: purviewIds,
+                        id:data.field.id
+                    },
+                    dataType: "json",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (data) {
+                        if (data.code == 0) {
+                            layer.msg(data.msg, {
+                                icon: 2,
+                                time: 2000//2秒关闭（如果不配置，默认是3秒）
+                            });
+
+                            $('meta[name="csrf-token"]').attr('content', data.data.token)
+                            return;
+                        }
+                        layer.msg(data.msg, {
+                            icon: 1,
+                            time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            //关闭当前frame
+                            xadmin.close();
+
+                            // 可以对父窗口进行刷新
+                            xadmin.father_reload();
+                        });
+                    }
+                });
+                return false;
+            });
+    });
+
+</script>
+{/block}
+</html>
