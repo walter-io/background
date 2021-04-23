@@ -20,14 +20,19 @@ class Purview extends BaseController
     {
         $arrData = Db::connect()
             ->name('purview')
-            ->field('id, name, parent_id, controller, action')
+            ->field('id, name, parent_id pId, controller, action')
             ->order('sort', 'asc')
             ->select()
             ->toArray();
 
-        $data = purview_tree_sec($arrData, [], 0);
+//        $arrData = purview_tree_sec($arrData, [], 0);
+        $editPurviewFlag = true;
+
+        $deletePurviewFlag = true;
         return View::fetch('', [
-            'list' => $data,
+            'list' => $arrData,
+            'editPurviewFlag'   => $editPurviewFlag,
+            'deletePurviewFlag' => $deletePurviewFlag
         ]);
     }
 

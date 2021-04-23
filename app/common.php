@@ -16,11 +16,13 @@ function purview_tree($arr, $pid = 0, $level = 1, $idName = 'id', $pidName = 'pa
 }
 
 // 递归树
-function purview_tree_sec($originArr, $resultArr, $pid = 0)
+function purview_tree_sec($originArr, $resultArr, $pid = 0, $level = 0)
 {
+    // TODO HERE
     foreach ($originArr as $k => $v) {
         if ($v['parent_id'] == $pid) {
-            $v['children'] = purview_tree_sec($originArr, $resultArr, $v['id']);
+            $v['level'] = $level;
+            $v['children'] = purview_tree_sec($originArr, $resultArr, $v['id'], $level + 1);
             $resultArr[] = $v;
         }
     }
@@ -34,7 +36,7 @@ function purview_tree_third($data, $level = 0)
     if (empty($data)) {
         return $str;
     }
-    $space = str_repeat('&nbsp;', $level * 3);
+    $space = str_repeat('&nbsp;', $level * 4);
     foreach ($data as $k => $v) {
         $str .= "<p>{$space}{$v['name']}</p>";
         $str.= purview_tree_third($v['children'] ?? [], $level++);
