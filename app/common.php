@@ -2,6 +2,9 @@
 // 应用公共文件
 
 //权限无限级树
+use think\exception\HttpResponseException;
+use think\Response;
+
 function purview_tree($arr, $pid = 0, $level = 1, $idName = 'id', $pidName = 'parent_id')
 {
     $tree = array();
@@ -67,4 +70,25 @@ function purview_format($arr, $selectArr = [])
         $i++;
     }
     return $data;
+}
+
+function error($msg = '', $data = '', $url = '')
+{
+    $result = [
+        'code' => 0,
+        'msg'  => $msg,
+        'data' => $data,
+        'url'  => $url,
+        'wait' => '',
+    ];
+
+    $type = 'html';
+    if ('html' == strtolower($type)) {
+        $type = 'view';
+        $response = Response::create(config('jump.dispatch_error_tmpl'), $type)->assign($result)->header([]);
+    } else {
+        $response = Response::create($result, $type)->header([]);
+    }
+
+    throw new HttpResponseException($response);
 }

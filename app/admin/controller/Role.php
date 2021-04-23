@@ -126,7 +126,8 @@ class Role extends BaseController
             $deletePurviewIds = array_diff($arrRolePurviewId, $ids);
             // 删除不包含的权限
             if ($deletePurviewIds) {
-                Db::name('role_purview')->where([
+                Db::name('role_purview')
+                    ->where([
                     ['role_id', '=', $id],
                     ['purview_id', 'in', implode(',', $deletePurviewIds)]
                 ])->delete();
