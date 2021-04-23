@@ -107,4 +107,57 @@ class Role extends BaseController
         Db::connect()->name('role')->where(['id' => $id])->delete();
         $this->success('删除成功');
     }
+
+    /**
+     * 分配角色权限
+     */
+    public function editPurview()
+    {
+        $id = request()->param('id');
+        if (empty($id)) {
+            $this->error('缺少参数');
+        }
+
+        //角色已有的权限
+        $arrRolePurviewId = Db::name('role_purview')->where(['role_id' => $id])->column('purview_id');
+
+        if (request()->isPost()) {
+            $ids = request()->post("ids");
+            $deletePurviewIds = array_diff($arrRolePurviewId, $ids);
+            // 删除不包含的权限
+            if ($deletePurviewIds) {
+                Db::name('role_purview')->where([
+                    ['role_id', '=', $id],
+                    ['purview_id', 'in', implode(',', $deletePurviewIds)]
+                ])->delete();
+            }
+            // 添加新增的
+            $insertPurviewIds = array_diff($ids, $arrRolePurviewId);
+            if ($insertPurviewIds) {
+                $data = [];
+                foreach ($insertPurviewIds as $v) {
+                    $data[] = [
+                        'role_id'    => $id,
+                        'purview_id' => $v,
+                    ];
+                }
+                $result = Db::name('role_purview')->insertAll($data);
+                if ($result) {
+                    $this->success('分配成功');
+                } else {
+                    $this->error('分配失败');
+                }
+            }
+        }
+        // 显示页面
+        $arrData = Db::name('purview')
+            ->field('id, name, parent_id, controller, action')
+            ->order('sort', 'asc')
+            ->select()
+            ->toArray();
+        $arrData = purview_tree($arrData);
+        $list    = purview_format($arrData, $arrRolePurviewId);
+
+        return View::fetch('', ['list' => $list, 'id' => $id]);
+    }
 }

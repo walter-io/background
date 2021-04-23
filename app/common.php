@@ -43,3 +43,28 @@ function purview_tree_third($data, $level = 0)
     }
     return $str;
 }
+
+
+/**
+ * 格式化权限适合ztree
+ * @param $arr
+ * @return array
+ */
+function purview_format($arr, $selectArr = [])
+{
+    $data = [];
+    $i = 0;
+    foreach ($arr as $k => $v) {
+        $data[$i] = [
+            'id' => $v['id'],
+            'pId' => $v['parent_id'],
+            'name' => $v['name'],
+        ];
+
+        if ($selectArr && in_array($v['id'], $selectArr)) {
+            $data[$i]['checked'] = true;
+        }
+        $i++;
+    }
+    return $data;
+}

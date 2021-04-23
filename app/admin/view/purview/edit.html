@@ -1,0 +1,128 @@
+{extend name="public/main" /}
+
+{block name="title"}{$purviewTreeArr[$currentPurviewId]['purview_name']}{/block}
+{block name="js"}
+<script type="text/javascript" src="/admin/js/xadmin.js"></script>
+{/block}
+{block name="body"}
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label for="pid" class="layui-form-label">
+                    <span class="x-red">*</span>父级名称
+                </label>
+                <div class="layui-input-inline">
+                    <select name="pid" lay-search>
+                        <option value="0">顶级菜单</option>
+                        {foreach $arrPurview as $key=>$vo }
+                        <option {if $data.parent_id==$vo.id}selected{/if} value="{$vo['id']}">{:str_repeat('&nbsp;&nbsp;', $vo['level']-1)}{:str_repeat('-', $vo['level']-1)}{$vo['name']}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label for="name" class="layui-form-label">
+                    <span class="x-red">*</span>权限名称
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="name" name="name"
+                           autocomplete="off" value="{$data.name}" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="controller" class="layui-form-label">
+                    <span class="x-red">*</span>控制器
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="controller" name="controller"
+                           autocomplete="off" value="{$data.controller}" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="myAction" class="layui-form-label">
+                    <span class="x-red">*</span>方法
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="action" name="action"
+                           autocomplete="off" value="{$data.action}" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="isShow" class="layui-form-label">
+                    <span class="x-red">*</span>是否显示
+                </label>
+                <div class="layui-input-inline">
+                    <select name="is_show">
+                        <option value="">未选择</option>
+                        <option value="1" {if $data.is_show == 1}selected{/if}>显示</option>
+                        <option value="2" {if $data.is_show == 2}selected{/if}>不显示</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="sort" class="layui-form-label">
+                    <span class="x-red">*</span>排序
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="sort" name="sort" autocomplete="off" class="layui-input" value="{$data.sort}">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <input type="hidden" name="id" value="{$id}">
+                <label for="sort" class="layui-form-label"></label>
+                <button class="layui-btn" lay-filter="edit" lay-submit="">
+                    修改
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'layer'],
+        function () {
+            $ = layui.jquery;
+            var form = layui.form,
+                layer = layui.layer;
+
+            //监听提交
+            form.on('submit(edit)', function (data) {
+                $.ajax({
+                    type: "post",
+                    url: "{:url('/admin/Purview/edit')}",
+                    data: data.field,
+                    dataType: "json",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (data) {
+                        if (data.code == 0) {
+                            layer.msg(data.msg, {
+                                icon: 2,
+                                time: 2000//2秒关闭（如果不配置，默认是3秒）
+                            });
+
+                            $('meta[name="csrf-token"]').attr('content', data.data.token)
+                            return;
+                        }
+                        layer.msg(data.msg, {
+                            icon: 1,
+                            time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            //关闭当前frame
+                            xadmin.close();
+
+                            // 可以对父窗口进行刷新
+                            xadmin.father_reload();
+                        });
+                    }
+                });
+                return false;
+            });
+        });
+</script>
+{/block}
+</html>

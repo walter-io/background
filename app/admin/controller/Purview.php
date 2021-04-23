@@ -51,6 +51,7 @@ class Purview extends BaseController
             $data['action']     = request()->post('action');
             $data['is_show']    = request()->post('is_show');
             $data['sort']       = request()->post('sort');
+            $data['create_dt']  = date('Y-m-d H:i:s');
             $result = Db::connect()->name('purview')->insert($data);
             if ($result) {
                 $this->success('添加成功');
@@ -76,27 +77,50 @@ class Purview extends BaseController
      */
     public function edit()
     {
-        $id = request()->param('id');
-        if (empty($id)) {
-            $this->error('缺少参数');
-        }
+
         if (request()->isPost()) {
-            // 保存
-            $data = [
-                'name'        => request()->post('name'),
-                'description' => request()->post('description'),
-                'create_dt'   => date('Y-m-d H:i:s'),
-                'update_dt'   => date('Y-m-d H:i:s'),
+            // 编辑
+            $id = request()->param('id');
+            $arrParams = [
+
+                'name'       => request()->param('name'),
+                'controller' => request()->param('controller'),
+                'action'     => request()->param('action'),
+                'parent_id'  => request()->param('pid'),
+                'is_show'    => request()->param('is_show'),
+                'sort'       => request()->param('sort'),
+                'update_dt'  => date('Y-m-d H:i:s'),
             ];
-            $result = Db::connect()->name('role')->where(['id' => $id])->update($data);
+            $result = Db::connect()->name('purview')->where(['id' => $id])->update($arrParams);
             if ($result) {
                 $this->success('更新成功');
             } else {
                 $this->error('更新失败');
             }
         }
-        $data = Db::connect()->name('role')->where(['id' => $id])->findOrEmpty();
-        return View::fetch('', ['data' => $data]);
+        // 显示页面
+        $id = request()->param('purviewId');
+        if (empty($id)) {
+            $this->error('缺少参数');
+        }
+
+        // 权限详情
+        $data = Db::connect()
+            ->name('purview')
+            ->field('name, parent_id, controller, action, is_show, sort')
+            ->where('id', $id)
+            ->find();
+        
+        // 权限列表
+        $arrPurview = Db::connect()
+            ->name('purview')
+            ->field('id, name, parent_id')
+            ->order('sort','asc')
+            ->select()
+            ->toArray();
+        $arrPurview = purview_tree($arrPurview);
+       
+        return View::fetch('', ['arrPurview' => $arrPurview, 'data' => $data, 'id' => $id]);
     }
 
     /**
@@ -108,7 +132,7 @@ class Purview extends BaseController
         if (empty($id)) {
             $this->error('缺少参数');
         }
-        Db::connect()->name('role')->where(['id' => $id])->delete();
+        Db::connect()->name('purview')->where(['id' => $id])->delete();
         $this->success('删除成功');
     }
 }
